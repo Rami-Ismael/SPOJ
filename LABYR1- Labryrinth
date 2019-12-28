@@ -1,0 +1,64 @@
+import java.io.*;
+import java.util.StringTokenizer;
+//find new diamter of a tree
+//https://www.youtube.com/watch?v=2PFl93WM_ao&t=618s
+public class Main {
+static int TC,R,C;
+    static int startingRow =0;
+    static int startingCol =0;
+static int dis = 0;
+static char [][] grid = new char[1000][1000];
+
+    public static void main(String[] args) throws IOException {
+	// write your code here
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter pw =new PrintWriter(new OutputStreamWriter(System.out));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        TC = Integer.parseInt(st.nextToken());
+        String line;
+        while (TC-->0){
+            st = new StringTokenizer(br.readLine());
+            C =Integer.parseInt(st.nextToken());
+            R = Integer.parseInt(st.nextToken());
+            //grid
+            for (int i=0;i<R;i++) {
+                line = br.readLine();
+                for (int j = 0; j < C; j++) {
+                    if (line.charAt(j) == '.') {
+                        startingRow = i;
+                        startingCol = j;
+                    }
+                    grid[i][j] = line.charAt(j);
+                }
+            }
+            //dfs search
+            //create a visted array
+            boolean[][] visted =new boolean[R][C];
+            dfs(visted,startingRow,startingCol,0);
+            boolean[][] neoVisted =new boolean[R][C];
+            dfs(neoVisted,startingRow,startingCol,0);
+            pw.println("Maximum  rope length is "+dis+".");
+            dis = 0;
+        }
+        pw.flush();
+    }
+
+
+    private static void dfs(boolean[][] visted, int row, int col, int distance) {
+        visted[row][col] = true;
+        if (distance>dis){
+            startingCol = col;
+            startingRow =row;
+            dis = distance;
+        }
+        //go up
+        if (row>0&&row<R&&grid[row-1][col]=='.'&&!visted[row-1][col])
+            dfs(visted,row-1,col,distance+1);
+         if (row+1<R&&grid[row+1][col]=='.'&&!visted[row+1][col])
+            dfs(visted,row+1,col,distance+1);
+         if (col>0&&col<C&&grid[row][col-1]=='.'&&!visted[row][col-1])
+            dfs(visted,row,col-1,distance+1);
+         if (col+1<C&&grid[row][col+1]=='.'&&!visted[row][col+1])
+            dfs(visted,row,col+1,distance+1);
+    }
+    }
