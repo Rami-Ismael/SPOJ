@@ -1,0 +1,70 @@
+import java.io.*;
+import java.util.*;
+public class Main {
+    static PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static String line;
+    static  int k,T,N,R,M;
+    static StringTokenizer st;
+    static Scanner in = new Scanner(System.in);
+    static char [] word;
+    public static void main(String[] args) throws IOException {
+T = Integer.parseInt(br.readLine());
+while (T-->0) {
+    st = new StringTokenizer(br.readLine());
+    N = Integer.parseInt(st.nextToken());
+    R = Integer.parseInt(st.nextToken());
+    M = Integer.parseInt(st.nextToken());
+    ArrayList<Integer> [] graph= new ArrayList[N+1];
+    for (int i=0;i<=N;++i)
+        graph[i]= new ArrayList<>();
+    while (R-->0){
+        st = new StringTokenizer(br.readLine());
+        int u = Integer.parseInt(st.nextToken());
+        int v  = Integer.parseInt(st.nextToken());
+        graph[u].add(v);
+        graph[v].add(u);
+    }
+    //run a bfs search method
+    int[] distance = new int[N+1];
+    int [] solider = new int[N+1];
+    while (M-->0){
+        st = new StringTokenizer(br.readLine());
+        k = Integer.parseInt(st.nextToken());
+        int S = Integer.parseInt(st.nextToken());
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(k);
+        solider[k]++;
+        int radius = 0;
+        //Queue<Integer> child = new LinkedList<>();
+        BitSet visited = new BitSet(N+1);
+        visited.set(k,true);
+        while (!queue.isEmpty()){
+            int  u= queue.poll();
+            for (int i=0;i<graph[u].size();i++){
+                int v = graph[u].get(i);
+                if (!visited.get(v)&&distance[u]+1<=S){
+                    queue.add(v);
+                    visited.set(v,true);
+                   distance[v] = distance[u]+1;
+                   solider[v]++;
+                }
+            }
+            //add to queue
+        }
+        distance[k] = 1;
+
+    }
+   // pw.println(Arrays.toString(distance));
+    boolean optimal = true;
+    for (int i=1;i<solider.length;i++)
+        if (solider[i] != 1) {
+            optimal = false;
+            break;
+        }
+        pw.println(optimal?"Yes":"No");
+
+}
+        pw.flush();
+    }
+}
