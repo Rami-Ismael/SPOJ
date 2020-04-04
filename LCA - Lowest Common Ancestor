@@ -1,0 +1,109 @@
+import javax.swing.text.Segment;
+import java.io.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.StringTokenizer;
+
+public class Main {
+static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+static PrintWriter pw =new PrintWriter(new OutputStreamWriter(System.out));
+static BitSet visited,children;
+static int height[] = new int[100000];
+static int [] first = new int[100000];
+static ArrayList<Integer>euler;
+static int N,m,Case;
+static int[] SegmentTree = new int[100000];
+   static ArrayList<Integer> graph[];
+    public static void main(String[] args) throws IOException {
+	// write your code here
+       int T = Integer.parseInt(br.readLine());
+       while (T-->0){
+           pw.println("Case "+(++Case)+":");
+           StringTokenizer st;
+            N = Integer.parseInt(br.readLine());
+            graph =new ArrayList[N+1];
+           for (int i=0;i<=N;i++) {
+               graph[i] = new ArrayList<>();
+           }
+           visited = new BitSet(N+1);
+           children = new BitSet(N+1);
+           euler = new ArrayList<>();
+           for (int i=1;i<=N;i++){
+               st = new StringTokenizer(br.readLine());
+               st.nextToken();
+               while (st.hasMoreTokens()){
+                   int val = Integer.parseInt(st.nextToken());
+                   children.set(val,true);
+                   graph[i].add(val);
+                   graph[val].add(i);
+               }
+           }
+           children.set(0,true);
+           euler = new ArrayList<>();
+          // System.out.println(children.nextClearBit(0));
+           dfs(children.nextClearBit(0),0);
+           m = euler.size();
+           build(1,0,m-1);
+           m =Integer.parseInt(br.readLine());
+           for (int i=0;i<m;i++){
+               st =new StringTokenizer(br.readLine());
+               int V = Integer.parseInt(st.nextToken());
+               int W = Integer.parseInt(st.nextToken());
+               int sol = lca(V,W);
+              pw.println(sol);
+           }
+       }
+       pw.flush();
+    }
+    static void dfs(int node, int h){
+            visited.set(node,true);
+            height[node] = h;
+            first[node] = euler.size();
+            euler.add(node);
+            for (int i=0;i<graph[node].size();i++){
+                int to = graph[node].get(i);
+                if (!visited.get(to)){
+                    dfs(to,h+1);
+                    euler.add(node);
+                }
+            }
+    }
+   static void build(int node, int tl, int tr){
+        if (tl==tr){
+                SegmentTree[node] = euler.get(tl);
+        }
+        else{
+            int mid = tl+(tr-tl)/2;
+            build(node<<1,tl,mid);
+            build(node<<1|1,mid+1,tr);
+            int l = SegmentTree[node<<1];
+            int r = SegmentTree[node<<1|1];
+            SegmentTree[node]  = height[l]<height[r]?l:r;
+        }
+    }
+    static int query(int node, int tl, int tr, int L, int R){
+        if (tl>R||tr<L)
+            return -1;
+        if (tl>=L&&tr<=R)
+            return SegmentTree[node];
+        int mid = tl+(tr-tl)/2;
+        int left = query(node<<1,tl,mid,L,R);
+        int right = query(node<<1|1,mid+1,tr,L,R);
+        if (left==-1) return right;
+        if (right==-1) return left;
+        if (height[left]<height[right])
+            return left;
+        return right;
+
+    }
+   static int lca(int u, int v){
+        int left  = first[u],right = first[v];
+        if (left>right){
+            int temp = right;
+            right = left;
+            left = temp;
+        }
+        return query(1,0,euler.size()-1,left,right);
+    }
+}
