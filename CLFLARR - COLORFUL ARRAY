@@ -1,0 +1,65 @@
+import java.io.*;
+import java.util.BitSet;
+import java.util.StringTokenizer;
+
+public class Main {
+
+    public static void main(String[] args) throws IOException {
+	// write your code here
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter pw =new PrintWriter(new OutputStreamWriter(System.out));
+        StringTokenizer st= new StringTokenizer(br.readLine());
+        int n = Integer.parseInt(st.nextToken());
+        int q = Integer.parseInt(st.nextToken());
+        int [] dsu = new int[n+1];
+        int [] color = new int[n+1];
+        I3 [] query = new I3[q];
+        for (int i=0;i<=n;i++) {
+            dsu[i] = i;
+            //intitlaize the value of the color array to zero
+            color[i] = 0;
+        }
+        //input
+        for (int i=0;i<q;i++){
+            st = new StringTokenizer(br.readLine());
+            query[i] = new I3(Integer.parseInt(st.nextToken()),Integer.parseInt(st.nextToken()),Integer.parseInt(st.nextToken()
+            ));
+        }
+        //bitset to run faster 
+        BitSet bits = new BitSet(n+1);
+          ///go thorugh all the query in reverse
+        for (int i=q-1;i>=0&&bits.cardinality()!=n;i--){
+            int l  = query[i].l;
+            int r = query[i].r;
+            int c  = query[i].c;
+            //find the next open disjoint set
+            for (int v = findSet(l,dsu);v<=r&&v<=n;v=findSet(v,dsu)){
+            //quit early
+                bits.set(v,true);
+                    color[v] = c;
+                    int k = v+1;
+                    dsu[v] = k;
+
+            }
+        }
+        for (int i=1;i<=n;i++){
+            pw.println(color[i]);
+        }
+            pw.flush();
+    }
+    static int findSet(int u, int [] arr){
+        if (u==arr.length)
+            return u;
+        if (u==arr[u])
+            return u;
+        return arr[u]=findSet(arr[u],arr);
+    }
+    static class I3{
+        int l,r,c;
+        I3(int l,int r, int c){
+            this.l = l;
+            this.r = r;
+            this.c = c;
+        }
+    }
+}
