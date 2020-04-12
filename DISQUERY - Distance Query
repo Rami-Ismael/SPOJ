@@ -1,0 +1,8 @@
+//there is a n citites n-1 road conenc ting the cities.
+//The keyword a unique path between each pair of firretn cities, and we know the exact length off each road
+//find the shortest and the eng tof the longest road on the path between the two cities
+//interger A,B and C meanin gthat there is a road of length C between
+//to find the min will be the heeight in the segmennt tree
+//the if there is a node 
+
+//https://www.spoj.com/problems/DISQUERY/
