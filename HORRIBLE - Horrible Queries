@@ -1,0 +1,109 @@
+import  java.io.*;
+import java.util.*;
+public class Main {
+    //https://www.hackerearth.com/practice/notes/segment-tree-and-lazy-propagation/
+    static PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static String line;
+    static int n, k, T, N, m, Q, q, R, C, x, M, id, x0, y0, g, y, d, SCC;
+    static StringTokenizer st;
+    static Scanner in = new Scanner(System.in);
+    static BitSet onStack = new BitSet(100000);
+    static ArrayList<Integer> graph[];
+    static int[] low, ids;
+    static Stack<Integer> stack;
+
+    public static void main(String[] args) throws IOException {
+        // write your code here
+        T = Integer.parseInt(br.readLine());
+        while (T-->0) {
+            st = new StringTokenizer(br.readLine());
+            int n = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
+            SegmentTree sg = new SegmentTree(n);
+            for (int i = 0; i < c; i++) {
+                st = new StringTokenizer(br.readLine());
+                int action = Integer.parseInt(st.nextToken());
+                if (action == 0) {
+                    int l = Integer.parseInt(st.nextToken()) - 1;
+                    int r = Integer.parseInt(st.nextToken()) - 1;
+                    long val = Long.parseLong(st.nextToken());
+                    sg.updateRange(1, 0, n - 1, l, r, val);
+                } else {
+                    int l = Integer.parseInt(st.nextToken()) - 1;
+                    int r = Integer.parseInt(st.nextToken()) - 1;
+                    pw.println(sg.queryRange(1, 0, n - 1, l, r));
+                }
+            }
+        }
+        pw.flush();
+    }
+
+    static class SegmentTree {
+        long[] segment;
+        long[] lazy;
+        int n = 0;
+
+        SegmentTree(int n) {
+            this.n = n;
+            segment = new long[4 * n];
+            lazy = new long[4 * n];
+        }
+
+        void push(int v) {
+            segment[v * 2] += lazy[v];
+            lazy[v * 2] += lazy[v];
+            segment[v * 2 + 1] += lazy[v];
+            lazy[v * 2 + 1] += lazy[v];
+            lazy[v] = 0;
+        }
+
+        void updateRange(int node, int start, int end, int l, int r, long val) {
+            if (lazy[node] != 0) {
+                // This node needs to be updated
+                segment[node] += (end - start + 1) * lazy[node];    // Update it
+                if (start != end) {
+                    lazy[node * 2] += lazy[node];                  // Mark child as lazy
+                    lazy[node * 2 + 1] += lazy[node];                // Mark child as lazy
+                }
+                lazy[node] = 0;                                  // Reset it
+            }
+            if (start > end || start > r || end < l)              // Current segment is not within range [l, r]
+                return;
+            if (start >= l & end <= r) {
+                // Segment is fully within range
+                segment[node] += (end - start + 1) * val;
+                if (start != end) {
+                    // Not leaf node
+                    lazy[node * 2] += val;
+                    lazy[node * 2 + 1] += val;
+                }
+                return;
+            }
+            int mid = (start + end) / 2;
+            updateRange(node * 2, start, mid, l, r, val);        // Updating left child
+            updateRange(node * 2 + 1, mid + 1, end, l, r, val);   // Updating right child
+            segment[node] = segment[node * 2] + segment[node * 2 + 1];        // Updating root with max value
+        }
+
+        long queryRange(int node, int start, int end, int l, int r) {
+            if (start > end || start > r || end < l)
+                return 0;         // Out of range
+            if (lazy[node] != 0) {
+                // This node needs to be updated
+                segment[node] += (end - start + 1) * lazy[node];            // Update it
+                if (start != end) {
+                    lazy[node * 2] += lazy[node];         // Mark child as lazy
+                    lazy[node * 2 + 1] += lazy[node];    // Mark child as lazy
+                }
+                lazy[node] = 0;                 // Reset it
+            }
+            if (start >= l & end <= r)             // Current segment is totally within range [l, r]
+                return segment[node];
+            int mid = (start + end) / 2;
+            long p1 = queryRange(node * 2, start, mid, l, r);         // Query left child
+            long p2 = queryRange(node * 2 + 1, mid + 1, end, l, r); // Query right child
+            return (p1 + p2);
+        }
+    }
+}
