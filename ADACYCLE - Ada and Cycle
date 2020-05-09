@@ -1,0 +1,39 @@
+  int n = ms.nextInt();
+       int [][] dp  = new int [n][n];
+       for(int i=0;i<n;i++)
+       Arrays.fill(dp[i], 100000);
+       for(int i=0;i<n;i++)
+       dp[i][i] = 0;
+       for(int i=0;i<n;i++){
+           for(int j=0;j<n;j++){
+               int k = ms.nextInt();
+               if(k!=0){
+               dp[i][j] = k;
+               }
+           }
+       }
+      
+            
+    //floyd warshall algo
+    for(int k=0;k<n;k++){
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(dp[i][j]>dp[i][k]+dp[k][j])
+                dp[i][j] = dp[i][k]+dp[k][j];
+            }
+        }
+    }
+  //  for(int i=0;i<n;i++)
+  //  pw.println(Arrays.toString(dp[i]));
+  //  pw.flush();
+    for(int i=0;i<n;i++){
+        long sum=100000;
+        for(int j=0;j<n;j++){
+            if(dp[i][j]!=100000&&dp[j][i]!=100000&&i!=j)
+            sum= Math.min(dp[i][j]+dp[j][i], sum);
+            else if(i==j&&dp[i][j]!=0)
+            sum= Math.min(dp[i][j], sum);
+        }
+        pw.println(sum==Integer.MAX_VALUE?"NO WAY":sum);
+    }
+        pw.flush();
