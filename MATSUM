@@ -1,0 +1,139 @@
+import java.io.*;
+import java.util.*;
+public class SumMatrix{ 
+static StringTokenizer st;
+static PrintWriter pw  = new PrintWriter(new OutputStreamWriter(System.out));
+public static void main(String[] args) {
+    MyScanner ms = new MyScanner();
+    int t = ms.nextInt();
+    while(t-->0){
+        int n = ms.nextInt();
+        FenwickTree ft = new FenwickTree(n);
+        String line = ms.nextLine();
+        while(!line.equals("END")){
+            st = new StringTokenizer(line);
+            if(st.nextToken().equals("SET")){
+
+                ft.updateBIT(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()) , Integer.parseInt(st.nextToken()));
+            }else{
+                
+                ft.answerQueries(new  Query(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), 
+                Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken())));
+            }
+            line = ms.nextLine();
+        }
+    }
+    pw.flush();
+}
+static class Query{
+    int x1,y1;
+    int x2,y2;
+    Query(int x1,int y1,int x2,int y2){
+        this.x1 = x1;
+        this.y1 = y1; this.x2 = x2;this.y2 = y2;
+    }
+}
+static class FenwickTree{
+    long size =0;
+    int [][] BIT;
+    // A function to answer the queries  
+ void answerQueries(Query q)  
+{  
+        int x1 = q.x1 ;  
+        int y1 = q.y1 ;  
+        int x2 = q.x2 ;  
+        int y2 = q.y2 ;  
+        long ans = getSum( x2, y2) - 
+                  getSum( x2, y1 - 1) -  
+                  getSum( x1 - 1, y2) + 
+                  getSum( x1 - 1, y1 - 1);  
+       pw.println(ans);  
+}  
+   
+    FenwickTree(int size){
+        this.size = size;
+        BIT = new int[size+1][size+1];
+    }
+    // A function to get sum from (0, 0) to (x, y)  
+     long getSum(int x,int y){
+        ++x; ++y; ///Index starts from 1
+    int y1,result = 0;
+
+    while(x > 0)
+    {
+        y1 =  y;
+
+        while(y1 > 0)
+        {
+           result += BIT[x][y1];
+           y1 -= (y1 & (-y1));
+        }
+        x -= (x & (-x));
+    }
+    return result;
+    }
+    void updateBIT(int x, int y,int val)  
+{ 
+    long indexValue = getSum(x,y) - getSum(x-1,y) - getSum(x,y-1) + getSum(x-1,y-1); ///Value at the original matrix(x,y).
+    //cout<<"Original matrix'x Index Value[x][y] = "<<indexValue<<endl;
+    ++x;++y;//idnex starf from 1
+    val-=indexValue;
+    int y1;
+    while(x<=size){
+        y1 = y;
+        while(y1<=size){
+            BIT[x][y1]+=val;
+            y1+=(y1&(-y1));
+        }
+        x += (x & (-x));
+    }
+}
+}  
+   
+
+
+
+
+public static class MyScanner {
+    BufferedReader br;
+    StringTokenizer st;
+
+    public MyScanner() {
+       br = new BufferedReader(new InputStreamReader(System.in));
+    }
+
+    String next() {
+        while (st == null || !st.hasMoreElements()) {
+            try {
+                st = new StringTokenizer(br.readLine());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return st.nextToken();
+    }
+
+    int nextInt() {
+        return Integer.parseInt(next());
+    }
+
+    long nextLong() {
+        return Long.parseLong(next());
+    }
+
+    double nextDouble() {
+        return Double.parseDouble(next());
+    }
+
+    String nextLine(){
+        String str = "";
+    try {
+       str = br.readLine();
+    } catch (IOException e) {
+       e.printStackTrace();
+    }
+    return str;
+    }
+
+ }
+}
