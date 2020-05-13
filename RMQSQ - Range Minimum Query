@@ -1,0 +1,58 @@
+import java.io.*;
+import java.util.*;
+public class simpleSegmentTree {
+    public static void main(String[] args) throws IOException{
+        //i wil be given an array to build the array
+        Scanner in = new Scanner(System.in);
+        int N = in.nextInt();
+        long [] arr = new long[N];
+        for(int i=0;i<N;i++)
+        arr[i] = in.nextLong();
+        int Q = in.nextInt();
+        SegmentTree sTree = new SegmentTree(arr);
+        while(Q-->0){
+            int i = in.nextInt();
+          //  i--;
+            int j= in.nextInt();
+            //j--;
+            System.out.println(sTree.rmq(1, 0, arr.length-1, i, j));
+        }
+        in.close();
+    }
+    
+    static class SegmentTree{
+        int n;
+        long [] seg;
+         int getMid(long L,long R){ return(int) (L+(R-L)/2);}
+        SegmentTree(long [] arr){
+            n = arr.length;
+            seg = new long[5*n];
+            build(arr,1,0,arr.length-1);
+        }
+        long rmq(int cur,int L,int R,int i,int j){
+            if(i>R||j<L) return Integer.MAX_VALUE;
+            if(L>=i&&R<=j) return seg[cur];
+            //copute the min possble of hte left snad right subtre
+            long pleft = rmq(cur<<1,L,getMid(L, R),i,j);
+            long pright = rmq((cur<<1)+1, getMid(L, R)+1, R, i, j);
+            return Math.min(pright, pleft);
+        }
+        private void build(long[] arr, int cur, int tl, int tr) {
+            if(tl==tr)
+            seg[cur] = arr[tl];
+            else{
+                //move the the elft usbtree
+                build(arr, cur<<1, tl, getMid(tl, tr));
+                //move to the right subtree
+                build(arr, (cur<<1)+1, getMid(tl, tr)+1, tr);
+                //the left node value 
+                long leftNode = seg[cur<<1];
+                //the right of the node value
+                long rightNode = seg[(cur<<1)+1];
+                //the node has the min vaue
+                seg[cur] = Math.min(leftNode, rightNode);
+            }
+            
+        }
+    }
+}
