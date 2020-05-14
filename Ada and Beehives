@@ -1,0 +1,164 @@
+import java.io.*;
+import java.util.*;
+public class TwoDBIT {
+    static StringTokenizer st;
+static PrintWriter pw  = new PrintWriter(new OutputStreamWriter(System.out));
+    public static void main(String[] args) {
+        MyScanner ms = new MyScanner();
+        int N = ms.nextInt();int M = ms.nextInt();int Q = ms.nextInt();
+        long [][] matrix  = new long[N][M];
+        for(int i=0;i<N;i++)
+        for(int j=0;j<M;j++)
+        matrix[i][j] =ms.nextInt();
+        FenwickTree ft = new FenwickTree(N, M, matrix);
+        for(int i=0;i<Q;i++){
+            int action = ms.nextInt();
+            if(action==1){
+                int I = ms.nextInt();
+                int J = ms.nextInt();
+                int P = ms.nextInt();
+                ft.addValue(I, J, P);
+            }else{
+               
+                Query q   = new Query(ms.nextInt()-1, ms.nextInt()-1, ms.nextInt()-1, ms.nextInt()-1);
+                ft.answerQueries(q);
+            }
+        }
+        pw.flush();
+
+    }
+    static class Query{
+        int x1,y1;
+        int x2,y2;
+        Query(int x1,int y1,int x2,int y2){
+            this.x1 = x1;
+            this.y1 = y1; this.x2 = x2;this.y2 = y2;
+        }
+    }
+    static class FenwickTree{
+        long size =0;
+        int row,col;
+        long [][] BIT;
+        // A function to answer the queries  
+     void answerQueries(Query q)  
+    {  
+            int x1 = q.x1 ;  
+            int y1 = q.y1 ;  
+            int x2 = q.x2 ;  
+            int y2 = q.y2 ;  
+            long ans = getSum( x2, y2) - 
+                      getSum( x2, y1 - 1) -  
+                      getSum( x1 - 1, y2) + 
+                      getSum( x1 - 1, y1 - 1);  
+           System.out.println(ans);  
+    }  
+            FenwickTree(int row,int col,long [][] matrix){
+                    this.row = row;
+                    this.col = col;
+                    BIT = new long [row+1][col+1];
+                    for(int i=0;i<row;i++){
+                        for(int j=0;j<col;j++){
+                            updateBIT(i, j,matrix[i][j]);
+                        }
+                    }
+                  
+            }
+        FenwickTree(int size){
+            this.size = size;
+            BIT = new long[size+1][size+1];
+        }
+        // A function to get sum from (0, 0) to (x, y)  
+         long getSum(int x,int y){
+            ++x; ++y; ///Index starts from 1
+        int y1;
+        long result=0;
+    
+        while(x > 0)
+        {
+            y1 =  y;
+    
+            while(y1 > 0)
+            {
+               result += BIT[x][y1];
+               y1 -= (y1 & (-y1));
+            }
+            x -= (x & (-x));
+        }
+        return result;
+        }
+        void addValue(int x,int y,long val){
+            int y1;
+            while(x<=row){
+                y1 = y;
+                while(y1<=col){
+                    BIT[x][y1]+=val;
+                    y1+=(y1&(-y1));
+                }
+                x += (x & (-x));
+            }
+        }
+        void updateBIT(int x, int y,long val)  
+    { 
+        long indexValue = getSum(x,y) - getSum(x-1,y) - getSum(x,y-1) + getSum(x-1,y-1); ///Value at the original matrix(x,y).
+        //cout<<"Original matrix'x Index Value[x][y] = "<<indexValue<<endl;
+        ++x;++y;//idnex starf from 1
+        val-=indexValue;
+        int y1;
+        while(x<=row){
+            y1 = y;
+            while(y1<=col){
+                BIT[x][y1]+=val;
+                y1+=(y1&(-y1));
+            }
+            x += (x & (-x));
+        }
+    }
+    }  
+       
+    
+    
+    
+    
+    public static class MyScanner {
+        BufferedReader br;
+        StringTokenizer st;
+    
+        public MyScanner() {
+           br = new BufferedReader(new InputStreamReader(System.in));
+        }
+    
+        String next() {
+            while (st == null || !st.hasMoreElements()) {
+                try {
+                    st = new StringTokenizer(br.readLine());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return st.nextToken();
+        }
+    
+        int nextInt() {
+            return Integer.parseInt(next());
+        }
+    
+        long nextLong() {
+            return Long.parseLong(next());
+        }
+    
+        double nextDouble() {
+            return Double.parseDouble(next());
+        }
+    
+        String nextLine(){
+            String str = "";
+        try {
+           str = br.readLine();
+        } catch (IOException e) {
+           e.printStackTrace();
+        }
+        return str;
+        }
+    
+     }
+}
